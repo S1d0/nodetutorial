@@ -1,13 +1,20 @@
-const fs = require('fs');
+import fs from 'fs'
+import http from 'http';
+import url from 'url'
 
-// Blocking 
-// const textIn = fs.readFileSync('./txt/input.txt', 'utf-8');
-// console.log(`File input.txt content:${textIn}`);
-// 
-// const textOut = `This is news: ${textIn}`;
-// fs.writeFileSync('./txt/output.txt', textOut)
-// 
-// Non blocking
-fs.readFile('./txt/input.txt', {encoding: 'utf-8'}, (_,text1)=>{
-    console.log(`File input.txt content:${text1}`);
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+const dataObj = JSON.parse(data);
+
+// Server
+const server = http.createServer((req, res) =>{
+    console.log(req.url)
+    const pathName = req.url;
+    if(pathName == '/overview') {
+        res.end("Hello Overview ");
+    }
+}) 
+
+server.listen(8080,'localhost',() => {
+    console.log("Listen here little shit :eyes:")
 });
+ 
