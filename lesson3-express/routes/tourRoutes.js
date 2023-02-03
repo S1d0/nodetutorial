@@ -7,10 +7,20 @@ router
   .get(tourController.getAllTours)
   .post(tourController.createTour);
 
+// Allias
+router
+  .route("/top-5-cheap")
+  .get(tourController.topFiveAllias, tourController.getAllTours);
+
+  router.route("/tour-stat").get(tourController.getTourStats);
+
+
 router
   .route("/:id")
   .get(tourController.getTour)
   .patch(tourController.updateTour)
   .delete(tourController.deleteTour);
+
+// statistics
 
 module.exports = router;
