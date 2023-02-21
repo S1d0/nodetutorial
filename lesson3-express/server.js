@@ -4,9 +4,10 @@ const app = require("./app");
 dotenv.config({ path: "./config.env" });
 
 const DB = process.env.DB;
+const DB_LOCALHOST = process.env.DB_LOCALHOST;
 
 mongoose
-  .connect(DB, {
+  .connect(DB_LOCALHOST, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
