@@ -1,5 +1,4 @@
 const { query } = require("express");
-const fs = require("fs");
 const AppError = require("../utils/apiError");
 const Tour = require("./../models/tourModel");
 const catchAsync = require("./../utils/catchAsync");
@@ -85,8 +84,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
-
+  const tour = await Tour.findById(req.params.id).populate("guides")
   if (!tour) {
     return next(new AppError(`Tour not found with id ${req.params.id}`, 404));
   }

@@ -1,0 +1,3 @@
+// Select the database to use.
+use('natours');
+db.tours.deleteMany({})
