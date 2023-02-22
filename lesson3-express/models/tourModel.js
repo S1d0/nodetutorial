@@ -85,7 +85,7 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+    guides: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   {
     toJSON: { virtuals: true },
@@ -101,6 +101,21 @@ tourSchema.pre("save", function (next) {
 
 tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
+});
+
+// Virtual populate
+tourSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "tour", // from Review model field
+  localField: "_id", // from TourModel id
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v",
+  });
+  next();
 });
 
 const Tour = mongoose.model("Tour", tourSchema);
