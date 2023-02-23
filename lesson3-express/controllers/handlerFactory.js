@@ -1,5 +1,6 @@
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/apiError");
+const APIFeatures = require("./../apiFeature");
 
 exports.deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
@@ -46,17 +47,27 @@ exports.getOne = (Model, populateOptions) =>
     });
   });
 
-
 exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
-    const docs = await Model.find()
-
-    if(!docs) {
-      return next(new AppError("Something went wrong", 500))
+    // Hack to make nested query possible in reviewController
+    let filter = {};
+    if (req.params.tourId) {
+      filter = { tour: req.params.tourId };
     }
+
+    const apiFeatures = new APIFeatures(Model.find(filter), req.query)
+      .filter()
+      .sort()
+      .limit()
+      .paginate();
+
+    const docs = await apiFeatures.query;
 
     res.status(200).json({
       status: "success",
-      docs
-    })
-  }) 
+      length: docs.length,
+      data: {
+        docs,
+      },
+    });
+  });

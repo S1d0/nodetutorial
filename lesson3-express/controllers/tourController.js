@@ -1,8 +1,7 @@
-const { query } = require("express");
-const AppError = require("../utils/apiError");
 const Tour = require("./../models/tourModel");
 const catchAsync = require("./../utils/catchAsync");
 const handlerFactory = require("./handlerFactory");
+const APIFeatures = require("./../apiFeature");
 
 exports.topFiveAllias = (req, rest, next) => {
   req.query.limit = 5;
@@ -12,90 +11,10 @@ exports.topFiveAllias = (req, rest, next) => {
   next();
 };
 
-class APIFeatures {
-  constructor(query, queryString) {
-    this.query = query;
-    this.queryString = queryString;
-  }
+exports.getAllTours = handlerFactory.getAll(Tour);
 
-  filter() {
-    // Shallow copy of object
-    const queryObj = { ...this.queryString };
-    const excludedFields = ["page", "sort", "limit", "fields"];
-    excludedFields.forEach((el) => delete queryObj[el]);
-    const queryStr = JSON.stringify(queryObj);
+exports.getTour = handlerFactory.getOne(Tour);
 
-    // replace all occurance gte|gt|lte|lt  to $gte or $gt or $lte or $lt
-    const replacedQuery = queryStr.replace(
-      /\b(gte|gt|lte|lt)\b/g,
-      (match) => `$${match}`
-    );
-
-    this.query = this.query.find(JSON.parse(replacedQuery));
-    return this;
-  }
-
-  sort() {
-    if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(",").join(" ");
-      this.query = this.query.sort(sortBy);
-    } else {
-      this.query = this.query.sort("-createdAt");
-    }
-
-    return this;
-  }
-
-  limit() {
-    if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(",").join(" ");
-      this.query = this.query.select(fields);
-    } else {
-      this.query = this.query.select("-__v");
-    }
-
-    return this;
-  }
-
-  paginate() {
-    const page = this.queryString.page * 1 || 1;
-    const limit = this.queryString.limit * 1 || 100;
-    const skip = (page - 1) * limit;
-    this.query = this.query.skip(skip).limit(limit);
-
-    return this;
-  }
-}
-
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  const apiFeatures = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limit()
-    .paginate();
-
-  const tours = await apiFeatures.query;
-  res.status(200).json({
-    status: "success",
-    length: tours.length,
-    data: {
-      tours,
-    },
-  });
-});
-
-exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate("reviews");
-  if (!tour) {
-    return next(new AppError(`Tour not found with id ${req.params.id}`, 404));
-  }
-
-  res.status(200).json({
-    status: "OK",
-    data: tour
-  })
-});
-  
 exports.createTour = handlerFactory.create(Tour);
 
 exports.updateTour = catchAsync(async (req, res, next) => {
