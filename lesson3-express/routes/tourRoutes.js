@@ -1,7 +1,12 @@
 const express = require("express");
-const router = express.Router();
 const tourController = require("./../controllers/tourController");
 const authController = require("./../controllers/authenticationController");
+const reviewRouter = require("./reviewRoutes")
+
+const router = express.Router();
+
+// Mounting diffrent router 
+router.use("/:tourId/reviews", reviewRouter)
 
 router
   .route("/")
@@ -25,7 +30,5 @@ router
     authController.restrictTo("admin", "lead-guide"),
     tourController.deleteTour
   );
-
-// statistics
 
 module.exports = router;

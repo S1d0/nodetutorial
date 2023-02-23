@@ -1,7 +1,10 @@
 const express = require("express");
-const router = express.Router();
 const reviewController = require("./../controllers/reviewController");
 const authController = require("./../controllers/authenticationController");
+
+// mergeParams to get parameters from tourRouter tourId
+// POST /tour/23412/reviews
+const router = express.Router({mergeParams: true});
 
 router
   .route("/")
@@ -9,7 +12,12 @@ router
   .post(
     authController.protect,
     authController.restrictTo("user"),
+    reviewController.setTourAndUserId,
     reviewController.createReview
-  );
-
+  )
+  
+router.route("/:id")
+  .get(reviewController.getReview)
+  .delete(reviewController.deleteReview);
+  
 module.exports = router;

@@ -12,7 +12,7 @@ const reviewSchema = new mongoose.Schema(
       default: Date.now,
     },
     rating: Number,
-    tour: { type: Schema.Types.ObjectId, ref: "Tour", required: true },
+    tour: { type: Schema.Types.ObjectId, ref: "Tour"},
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   {
